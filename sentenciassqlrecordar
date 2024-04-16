@@ -1,0 +1,37 @@
+SELECT * FROM empleados;
+
+SELECT * FROM empleados where nombre = 'Jorge'
+#seleciona todos los datos de empleados donde la edad sea 29
+SELECT * FROM empleados where edad = '29'
+
+#limpia la tabla
+TRUNCATE TABLE empleados;
+
+#elimina los datos de empleadod donde el id sea 7
+DELETE from empleados where idEmpleado=7;
+
+#altera la tabla empleados agregando  la columna sexo donde su tipo de dato es char(1)
+ALTER TABLE empleados add sexo char(1);
+
+#altera la tabla empleados eliminando la columna feccontratacion sin importas sus datos porque no hay restriccion
+ALTER TABLE empleados DROP COLUMN fechaContratacion;
+
+#operadores
+<>,!= compara si dos valores son diferentes
+
+#seleciona todos los datos de empleados donde el idempleado sea igual a 3
+SELECT * FROM empleados WHERE idEmpleado = 3;
+
+#seleciona todos los datos donde la edad sea diferente a 25
+SELECT * FROM empleados WHERE edad != 25;
+SELECT * FROM empleados WHERE edad <> 25;
+
+#-- con doble guien se escribe comentario  y con /*se comentara todas las filas para abajo
+solo se ejecutara fom empleados y no donde este el comentario
+SELECT * FROM empleados --WHERE edad = 25
+#aca se establece que consultas van a ser solo comentario abriendo y cerrando
+/*SELECT * FROM empleados 
+WHERE edad = 25 ̣;*/
+
+#este comando cambia el nombre en la tabla empleados de idempleados por id
+EXEC sp_rename 'Empleados.idempleado', 'id' ;
