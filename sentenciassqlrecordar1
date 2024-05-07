@@ -1,0 +1,535 @@
+SELECT * FROM empleados;
+
+SELECT * FROM empleados where nombre = 'Jorge'
+#seleciona todos los datos de empleados donde la edad sea 29
+SELECT * FROM empleados where edad = '29'
+
+#limpia la tabla
+TRUNCATE TABLE empleados;
+
+#elimina los datos de empleadod donde el id sea 7
+DELETE from empleados where idEmpleado=7;
+
+#altera la tabla empleados agregando  la columna sexo donde su tipo de dato es char(1)
+ALTER TABLE empleados add sexo char(1);
+
+#altera la tabla empleados eliminando la columna feccontratacion sin importas sus datos porque no hay restriccion
+ALTER TABLE empleados DROP COLUMN fechaContratacion;
+
+#operadores
+<>,!= compara si dos valores son diferentes
+
+#seleciona todos los datos de empleados donde el idempleado sea igual a 3
+SELECT * FROM empleados WHERE idEmpleado = 3;
+
+#seleciona todos los datos donde la edad sea diferente a 25
+SELECT * FROM empleados WHERE edad != 25;
+SELECT * FROM empleados WHERE edad <> 25;
+
+#-- con doble guien se escribe comentario  y con /*se comentara todas las filas para abajo
+solo se ejecutara fom empleados y no donde este el comentario
+SELECT * FROM empleados --WHERE edad = 25
+#aca se establece que consultas van a ser solo comentario abriendo y cerrando
+/*SELECT * FROM empleados 
+WHERE edad = 25 ?;*/
+#este comando muestra toda las columnas existentes en la tabla empleados con su tipo de dato y todo
+exec sp_help empleados;
+
+#este comando cambia el nombre en la tabla empleados de idempleados por id
+EXEC sp_rename 'Empleados.idempleado', 'id' ;
+
+#esta peticion indica que actualize la tabla empleados y espablece la columna telefono a 8888335552 donde el id sea igual a 3
+update empleados set telefono = 8888335552 
+ where id = 3;
+
+#esta peticion indica que actualize la tabla empleados y espablese la columna activo a NO donde el id sea (1,3,5,7,9)
+update empleados set activo = 'NO' 
+ where id in (1,3,5,7,9);
+
+#esta peticion indica que selecione todos los datos de la tabla empleados donde la edad sea (25,31,34)
+ select * from empleados where edad in(25,31,34);
+
+#esta peticion indica que elimine de la tabla empleados donde el id sea (3,8,15)
+ delete from empleados where id in(3,8,15);
+
+#importacion de datos de una tabla a otra
+#esta peticion india que inserte dentro de la tabla salarios en los campos nombre apellido y salarios los  valores seleccionnado nombre apellido y salario desde la tabla empleados
+insert into salarios(nombre, apellido, salario)
+select nombre, apellido, salario from empleados;
+
+#esta peticion indica que inserte dentro de la tabla salarios en los campos nobre apellido y salarios los valores selecionados nombre apellido y salario desde la tabla empleados donde el salario sea mayor a 2500
+insert into salarios(nombre, apellido, salario)
+select nombre, apellido, salario from empleados
+where salario > 2500;
+
+#esta peticion indica que seleccione los primeros 5 registros de  toda la tabla empleados
+select top 5 * from empleados;
+
+#esta peticion indica que seleccione la mitad de registros de toda la tabla empleados 
+select top 50 percent * from empleados; 
+
+#esta peticion indica que seleccione los 3 primeros registros de toda la tabla empleados donde la columna activo sea no
+select top 3 * from empleados
+where activo = 'NO';
+
+#esta peticion indica que selecione todos los registos de la tabla clientes donde el nombre es NULL
+select * from clientes where nombre is null;
+
+#esta peticion indica que seleccione todos los registros donde el campo nombre es NOT NULL osea que no tenga ningun valor
+select * from clientes where nombre is not null;
+
+#esta peticion indica que actualize la tabla clientes y establezca el campo dirrecion con 'no tiene' donde la dirrecion es null
+update clientes set dirrecion = 'no tiene' 
+where dirrecion is null;
+
+#esta peticion elimina de clientes valores especificos y no todos donde el nombre es null
+delete from clientes where nombre is null;
+
+#borra la tabla clientes
+drop table clientes;
+
+#crear tablas
+create table clientes(
+	idcliente int not null,
+	nombre varchar(20) not null,
+	direccion varchar(100) not null,
+	telefono numeric(10) null,
+	email varchar(50) null,
+
+);
+
+#esta peticion indica que inser dentro de la tabla cliente los siguientes valores y que si la columna permite se pondra su valor como null
+insert into clientes values(2,'Manuel','calle segunda',null,null);  
+
+#con estsa dos peticiones podemos ahcer que una columna sea primary key
+create table personas(
+	idpersona int primary key,
+	nombre varchar(10) not null,
+	edad int not null,
+);
+o create table personas(
+	idpersona int ,
+	nombre varchar(10) not null,
+	edad int not null,
+	primary key(idpersona)
+);
+#esta peticion indica que quiere crear una regla llamada pk_enlace_persona que va ser de tipo primary key y se le va aplicar al campo idpersona
+create table personas(
+	idpersona int ,
+	nombre varchar(10) not null,
+	edad int not null,
+	constrain PK_enlace_persona primary key(idpersona)
+);
+
+#esto en caso de que ya hayamos creado una tabla y queramos establecer una primary key
+#esta peticion incdica que altere la tabla personas y agregue una regla PK_enlace que va ser primary key y que se le va apliacr al campo ya existente idpersona
+alter table personas 
+add constraint PK_enlacoe primary key(idpersona); 
+
+#esta  peticion indica que altere la tabla persona y elimine la regla PK_enlace	
+alter table personas drop constraint PK_enlace;
+
+#esta peticion indica las diferentes formas de crear una tabla agregando una regla unique que hace que todos los valores sean unicos
+create table Personas(
+	idpersona int not null #unique,
+	nombre varchar(10),
+	edad int
+#constarint UQ_idpersona unique(idpersona)
+);
+
+#esta peticion indica que altere la tabla personas agregando una relga UQ_persona y eslablecas como unique a la columna idpersona, pero a diferencia de la regla primary key la regla unique si permite valores null
+#pero para evitar eso lo podemos poner como not null al lado de unique cuando estemos creando la tabla
+alter table Personas
+add constraint UQ_idpersona unique idpersona
+
+#y esta peticion indica que altere la tabla personas y elimine la regla UQ_idpersona
+alter table Personas
+drop costraint UQ_idpersona;
+
+#esta peticion indica que se cree una tabla pero la regla check especifica o verifica que la edad tiene que ser >=18 y si no es asi no permitira otros valores que no sean esos 
+#esta peticion indica las diferentes formas de estaclecer a una tabla la regla check
+create table personas(
+	id int not null,
+	nombre varchar(10) ,
+	edad int #check(edad>=18),
+	#check (edad >=18  )
+	#constraint CK_edad check (edad>=18)
+);
+
+#esta peticion indica que se altere la tabla y agregue un check a la edad para que sea >=18 si no lo establecimos a la hora de crear la tabla
+alter table personas
+add check(edad>=18)
+
+#esta peticion indica que se alterara la rabla personas eliminando la regla CK_personas_edad_#### o con el nombre que le hayamos dado
+alter table personas
+drop constreint CK_personas_edad_###### 
+
+#esta peticion indica que se crea una tabla y se crea una tabla ciudad donde si no tiene un valor asignido se le asisgara por defecto no tiene
+#estas son diferentes porfas de establecer un default
+create table personas(
+	idpersonas int not null,
+	nombre varchar(10),
+	edad int not null,
+	ciudad varchar(50) #default 'no tiene'
+);
+
+#default es una regla que establece un valor por defecto a una tabla si no tiene ningun  valor
+#esta peticion indica que se altere  la tabla personas y se agregue el contraint DF_ciudad estableciento la reglra default 'no tiene' para la columna ciudad en caso de que no la hayamos establecido cuando creamos la tabla
+alter table personas 
+add constaint DF_ciudad
+default 'no tiene' for ciudad;
+
+#esta peticion indica que se altere la tabla personas y se elimine la regla DF_ciudad
+alter table personas 
+drop constraint DF_ciudad;
+
+#identity es una regla que indica que su valor aumentara automaticamente
+#esta peticion indica que se creara una tabla pero el codigo estara con una regla identity donde no sera necesario insertar un valor en esa tabla porque se aumentara en 1 automaticamente
+#tambien indica que se empezara desde el 10 y se aumentara de 1 en 1
+create table libros(
+	codigo int identity #(10,1),
+	titulo varchar(60) not null,
+	autor varchar(60) not null
+);
+#esta peticion nos nos selecionara el valor en se empieza en nuestra tabla libros
+select ident_seed('libros');
+#y esta peticion nos seleccionara el valor con el que se incrementa
+select ident_incr('libros');
+
+#esta peticion establece que podamos poner nuevos valores sin inportar que sea identity porque lo esta desactivando y con off la activa
+set identity_insert libros on #off;
+
+#esta peticion indica que creara una vista Clientes_Nacionales y sera como un alias de seleccionar todo de clientes
+#una vista es como una tabla temporal de lo que solo queremos ver
+create view Clientes_Nacionales
+as 
+select * from clientes;
+
+#esta peticion indica que se creara una vista Mayores_30 seleccionando nombre, apellido, telefono, edad de la tabla clientes donde edad > 30
+create view Mayores_30
+as 
+select nombre, apellido, telefono, edad
+ from clientes where edad > 30;
+
+#esta peticion indica que se alterara la vista Mayores_30 agregando la columna fecha nacimiento de la tabla clientes donde edad>30
+alter view Mayores_30
+as 
+select nombre, apellido, telefono, edad, fecha_nacimiento
+ from clientes where edad > 30;
+
+#con esta pelicion se elimina la vista mayores_30
+drop view mayores_30;
+
+#esta ptecicion indica que se creara un un indice clausterizado llamado I_idempleado en la tabla empleados en la columna id
+#asi se le puede agregar un indice a dos o mas tabla pero lo recomendado es 2 nomas
+create clustered index I_idempleado
+on empleados (id #,salario);
+
+#esta peticion indica que se creara un indice no clausterizado llamado I_edad_empledo en la tabla empleados en la columna edad
+create  nonclustered index I_edad_empleado
+on empleados (edad);
+
+#esta peticion indica que se cambiara el nombre del indice I_idempleado de la tabla empleados por I_id 
+exec sp_rename 'Empleados.I_idempleado', 'I_id', 'INDEX';
+
+#esta peticion indica que se eliminara el indice I_id de la tabla empleados
+drop index I_id on Empleados;
+
+#esta peticion selecionara los valores dististons de la columna pais de la tabla clientes 
+select distinct pais from clientes;
+
+#esta peticion selecionara los valores distintos de la columna id_cliente de la tabla clientes donde pais sea igual = 'Argentina'
+select distinct id_cliente from clientes
+where pais = 'Argentina';
+
+#esta peticion seleccionara los valores distintos de la columna pais donde las compras seas null
+select distinct(pais) from clientes
+where compras is null;
+
+#esta peticion indica que seleccionala las columnas id nombre y apellido y salario pero a id se le aplicara un alias como IDENTIFICADOR para su mejor identificacion
+#para que tengan un espacio tiene que tener commilas asi as "primer nombre"
+select id as Identificador, nombre #as Primer_nombre, apellido as Primer_apellido, salario from Empleados
+where salario < 3000;
+#esta peticion indica que se seleccionaran las columnas nombre y appelido y se concatenara de la tabla empleados, solo servira para datos que sean el mismo tipo de dato
+# para que sea lejible se le tiene que agregar comillas asi + '' + y se le puede poner cualquier caracter para separarlo ya sea -, o cualquiera
+select nombre + apellido from empleados;
+selcct nombre + ' ' + apellido from empleados;
+#esta peticion indica que seleccionara las columnas nombre edad y apellido pero a edad usando el comando cast se le convertira al tipo de dato varchar(2) para poder realizar la concatenacion correctamente de la tabla empleados
+#y la la nueva columna tendra el nombre de Datos
+select nombre + ' ' + apellido + ' ' + 
+cast(edad as varchar(2)) as "Datos de empleados" from empleados;
+ 
+#esta peticion seleccionara las columnas nombre , descripcion y precio pero se creara una nueva columna que tenra el alias Nuevo Precio que tendra un aumento del 10% del precio original y seria asi precio + (precio * 0.1)
+select nombre, descripcion,
+precio + (precio * 0.1) as "Nuevo Precio" from articulos;
+
+#esta peticion indica que seleccionara las columnas nombre descripcion y precio pero se creara una nueva columna por que la columna original no tiene la operacion aritmetica llamada descuento que tendra el descuento del 10% del precio original y sera asi precio - (precio * 0.1)
+select nombre, descripcion,
+precio - (precio * 0.1) as "Descuento" from articulos;
+
+#esta peticion indica que seleccionara la columna nombre, descripcion, y que hara una operacion en el precio por la cantidad y se le asisgnara a la nueva columna costo total de la tabla articulos 
+select nombre, descripcion,precio * cantidad as "Costo total" from articulos;
+
+#esta peticion indica que se seleccionara las columnas nombre descipcion y precio y se creara una nueva columna con el precio * vendidos y se llamara ventas que sera el total de ventas de esos productos
+select nombre, descripcion,
+precio * vendidos as "ventas" from articulos;
+
+#esta columna indica que se seleccionara la columna nombre,descipcion y cantidad pero se realizara una operacion, cantidad - vendidos y se le asisgana a la nueva columna creada llamada Exsistencia de la tabla productos
+#algunos valores quedaran en negativo devido a que la cantidad es menor al valor vendido 
+select nombre, descripcion,
+cantidad - vendidos as Exsistencia from articulos;
+
+#con esta peticion creamos un nuevo esquema llamado ventas 
+create schema ventas;
+#esta peticion indica que se creara una nuevla tabla llamada clientes en el esquema ventas
+create table ventas.clientes(
+idclientes int,
+nombre int,
+dirrecion varchar(30)
+);
+
+#esta peticion indica que se elimine la tabla cobros del esquema ventas
+drop table ventas.cobros;
+
+#esta peticion indica que seleccionara todas las columnas de empleados ordenados por la columna edad en orden ascendente
+#el comando asc indica que se ordenara los datos de menor a mayor o en orden ascendente, el comando desc es para descendente
+select * from empleados order by edad #asc;
+
+#esta peticion indica que ordenara los datos por activo pero empezara por el NO por ordne alfabetico porque es pordefecto
+#emcambio si le ponemos el desc lo hara de la forma contraria alfabeticamente
+select * from empleados order by activo #desc;
+
+#esta peticion indica que seleccionara todos los datos de la tabla empleados donde la edad sea mayor a 25 ordenados por la edad pero de manera que esta por defecto
+select * from empleados
+where edad > 25 order by edad;
+
+#esta peticion indica que seleccionara los campos de la tabla empleados y seran ordenados por la edad y salario por defecto porque no esta especificado 
+#al utilizar los comandos desc y asc se utilizara el que esta primero porque el sistema prioriza la congruencia de los datos
+select nombre, apellido, edad , salario from empleados
+order by edad #desc, salario #asc;
+
+#esta peticion seleccionara el dato mas caro de la columna precio de la tabla articulos
+#esta otra el damo menos caro o el dato con el valor mas bajo
+select min(precio) as Mas_Barato from articulos;
+select max(precio) as Mas_Caro from articulos;
+
+#esta peticion seleccionara el dato bajo y el mas caro y se le asignara un alias de la tabla articulos
+select min(precio) as Mas_Barato 
+       max(precio) as Mas_Caro
+       from articulos;
+
+#esta peticion seleccionara en el caso de el tipo de dato varchar o caracter el dato con la letra del alfabeto mas alto osea el que este as cerca de la ultima letra
+# y si se le cambia a min seleccionaria el dato con el caracter mas bajo del alfabeto que esta en la tabla articulos
+select max(nombre) from articulos;
+
+#esta peticion contara todos los registros en una columna con el alias cantidad de la tabla empleados 
+select count(*) as Cantidad from Empleados;
+
+#esta peticion indica que contara los registros de la columna sueldo de la tabla empleados donde el puesto sea el de asistente
+select count(sueldo) from Empleados
+where puesto = 'Asistente';
+
+#esta peticion indica seleccionara y  sumara todos los registros de la columna sueldo de la tabla empleados y estara en una columna con el alias total
+#mientras el puesto sea el de asistente
+select sum(sueldo) as Total from empleados;
+#where puesto = 'Asistente';
+
+#esta peticion indica que seleccionara el promedio de la columna sueldo de la tabla empleados
+#y solo seleccionara el promedio de sueldo mientras el puesto sea gerente
+select avg(sueldo) from empleados;
+#where puesto = 'Gerente';
+
+#esta peticion indica que seleccionara el promedio de la columna sueldo pero de valores que seran distintos en la tabla empleados
+o sea que para hacer el calculo del promedio solo se usaran valores dinstintos 
+select avg(distinct sueldo) from empleados;
+
+#esta peticion indica que sumara todos los valores distintos de la columna sueldo y cant_hijos y tendran sus alias de la tabla empleados 
+select sum(distinct sueldo) as Total_Sueldos, sum(cant_hijos) as total_hijos
+ from empleados;
+
+#esta peticion indica que va contavilizar todos los registros y tendra un alias registros, se hara un promedio de la columna sueldo y tendra un alias promedio_sueldo y
+sumara los valores en la columna cant_hijos y tendra un alias total_hijos de la tabla empleados mientras el id sea 1,3,5,8
+select count(*) as registros, avg(sueldo) as promedio_sueldo,
+sum(cant_hijos) as total_hijos from empleados
+where id_empleado in (1,3,5,8);
+
+#esta peticion indica que seleccionara todos los datos de la tabla clientes mientras el pais sea italia y la ciudad sea roma
+#si se una el comando and o Y las dos consultan tienen que ser verdad o tienen que ser verdad
+select * from clientes
+where pais = 'Italia' and ciudad = 'Roma';
+
+#esta peticion seleccionara todos los datos de la tabla clientes mientras la ciudad sea roma o venecia
+#al utilizar el comando or solo una de las dos conlustas debe ser verdad o sea una nomas tiene que cumplirse pero si son las nos no hay problema
+select * from clientes
+where ciudad = 'Roma' or ciudad = 'Venecia' ;
+
+#esta peticion indica que seleccionara todos los registros de la tabla clientes mientras el pais no se alemina y no sea tampoco canada
+select * from clientes
+where not pais = 'Alemania', and not pais = 'Canada' ;
+
+
+#betwenn sirve para consultar valores pero en un rango especifoco similar a un range(1,8)
+#esta peticion indica que seleccionara todos los datos de la tabla empleados mientras id_empleado este en el rango de 1 y 7
+select * from empleados
+where id_empleado 
+between 1 and 7;
+
+#esta peticion indica que seleccionara todos los datos de la tabla empleados mientras el id_empleado este en el rango de 1 y 7 o cant_hijos este en el rango de 5 y 8
+#en este caso hara caso al del rango de 1 y 7 pero si el otro esta en un rango de 1 y 8 traera el de los hijos porque solo puede hacer una de las dos peticiones
+select * from empleados
+where id_empleado 
+between 1 and 7 or cant_hijos between 5 and 8;
+
+#esta peticion indica que seleccionara todos los datos de la tabla empleados mientras el sueldo este entre 2000 y 4000 y el puesto que no sea Desarrolador y tecnico 
+select * from empleados
+where sueldo between 2000 and 4000
+and puesto not in('Desarrolador', 'tecnico');
+
+#esta peticion  indica que seleccionara todos los datos de la tabla empleados mientras el pais este entre alemania y canada alfabeticamente o la primera letra osea A y C
+y solo traera datos de la letra a b y c y ningun otro dato que no tengan estas iniciales, y se ordenara alfabeticamente por el pais
+select * from empleados
+where pais between 'Alemania' and 'Canadá'
+order by pais;
+
+#esta peticion indica que seleccionara todos los datos mientras la fecha_contratacion este entre '1996-07-01' y '2003-05-06' y seran ordenados por la fecha de 
+de contratacion de manera por defecto
+select * from empleados
+where fecha_contratacion between '1996-07-01' and '2003-05-06'
+order by fecha_contratacion;
+
+#esta peticion indica que seleccione todos los datos mientras nombre comiente con A, y si se pone el % seleccionaran todos los datos que terminan con A
+# si esta asi %A% traera todos los datos que tengan una A
+# si esta _a% asi traera todos los datos que tengan una a como segundo caracter, si es --a% traera el que este en el tercer caracter la a, depende de cuantos -utilizemos
+# si esta asi a_% traera todos los datos que tengan de penultimo caracter la a, a%o si esta asi traera los datos que tengan una a en el primer caracter y una o en el ultimo caracter
+select * from clientes
+where nombre like 'A%';
+
+#esta peticion indica que seleccionara todos los datos mientras la columna nombre no tenga como 2do caracter la a 
+select * from clientes
+where nombre not like '_a%';
+
+#esta peticion indica que seleccionara de la tabla ordenes id_orden , de la tabla clientes la columna nombre de la tabla ordenes y hara un enlace interno en donde la 
+columna idcliente de la tabla ordenes sea igual a la columna idcliente de la tabla clientes/osea d elos valores que comparten ambas tablas
+
+select ordenes.id_orden, clientes.nombre
+from ordenes 
+inner join clientes on ordenes.idcliente = clientes.idcliente;
+
+#esta peticion seleccionara de la tabla ordenes la columna id_orden, de la tabla clientes la columna nombre, la columna appelido, y de la tabla orden la columna  fecha_orden
+de la tabla ordenes y hara un enlace interno de clientes en donde la tabla ordenes la columna idclientes sea = a la columna cliente de la tabla clientes mientras el nombre sea juan y sera ordenado por la fecha_orden;
+select ordenes.id_orden, clientes.nombre, clientes.apellido, orden.fecha_orden 
+from ordenes 
+inner join clientes on ordenes.idcliente = clientes.idcliente;
+where nombre = 'Juan', order by fecha_orden;
+
+#esta peticion indica que seleccione el nombre de la tabla clientes, el apellido y el id_orden de la tabla orden de la tabla clientes y haga un enlace izquierdo donde 
+ordenes en idcliente de la tabla clientes sea = ordenes.idcliente/seleccionara los datos del enlace izquierdo y los que comparte con la otra tabla/y seran ordenados por
+fecha_orden de manera por defecto/ la tabla 1-de la izquierda seria clientes y la de la derecha ordenes
+select clientes.nombre, clientes.apellido, orden.id_orden 
+from clientes 
+left join ordenes on clientes.idcliente = ordenes.idcliente;
+#where nombre = 'Juan'#, order by fecha_orden;
+
+#esta peticion hace lo mismo que arriba solo que se le esta poniendi un alias a la tabla clientes por cli y a la tabla ordenes ord
+select cli.nombre, cli.apellido, ord.id_orden, ord.fecha_orden 
+from clientes cli
+left join ordenes ord on cli.idcliente = ord.idcliente;
+ord by fecha_orden;
+
+#esta peticion indica que seleccionara id_orden de la tabla clientes, nombre y apellido de la tabla clientes De la tabal clientes y hara un enlace derecho de ordenes 
+en id.cliente de la tabla ordenes sea = a id_cliente de la tabla clientes/la de la derecha es la tabla ordenes y de la izquierda la tabal clientes y traera todos los datos de la tabla ordenes y los datos donde 
+haya coincidencias en la tabla clientes 
+
+select orden.id_orden, clientes.nombre, clientes.apellido,  
+from clientes 
+right join ordenes on ordenes.idcliente = clientes.idcliente;
+order by ordenes.id_orden;
+
+#seleccionara todos los datos de las dos tabla y sus columnas seleccionadas y se ordenara por id_orden de la tabla ordenes/todo mientras lo especifique en el select
+select orden.id_orden, clientes.nombre, clientes.apellido,  
+from clientes 
+full join 
+ordenes on ordenes.idcliente = clientes.idcliente;
+order by ordenes.id_orden;
+
+#esta peticion indica que seleccionara los campos de las dos tabla y hara una union de todo lo seleccionado/las columnas deben ser iguales en las dos tabla como sus tipos
+de datos y es una alternativa a un join y se ordenara por el pais / si se le agrega el all se puede ver incluso los datos duplicados de los dos select  
+#se le esta agregando una columna llamada tipo donde se podra ser de que tabla es la fila 
+select # 'Cliente' as Tipo ,#contacto, ciudad, pais  from clientes
+union #all
+select #'Suplidor' as Tipo ,#contacto, cuidad, pais from suplidores
+order by pais;
+
+#seleccionaran las columnas ciudad y pais de la tabla clientes y suplidor mientras el pais sea = 'Mexico'/tambien se vera la columna tipo mostrando de donde es la fila
+select # 'Cliente' as Tipo ,#ciudad, pais  from clientes where pais = 'mexico'
+union #all
+select #'Suplidor' as Tipo ,#cuidad, pais from suplidores where pais = 'Mexico';
+
+
+#esta peticion indica que seleccionara un contedeo de idcliente, seleccionara la columna pais de la tabla clientes y se agrupara por pais y se ordenara de forma ascendente	
+select count(idcliente) as Cantidad , pais
+from clientes 
+grup by pais order by count(idcliente);
+
+#esta peticion indica que seleccionara el idcliente maximo que tendra el alias cantidad,tambien seleccionara pais de la tabla clientes y se agrupara por el pais y se ordenara por el conteo del idcliente
+#si se usa min se mostrara los idcliente minimo de cada pais seleccionado/si se usa avg sumara todos los idcliente y se hara su promedio de su campo para el pais
+select max(idcliente) as Cantidad , pais
+from clientes 
+grup by pais order by count(idcliente);
+
+#esta peticion indica que seleccionara de v.nombre, contara los registros de idorden.delatablao como cantidad de ordenes de la tabla ordenes alias 'o' se hara un enlace izquierdo
+de la tabla vendedor alias 've' en donde ve.id_vendedor sea = o.id_vendedor y se agrupara por ve.nombre
+select ve.nombre, count(o.idorden) as "Cantidad de ordenes"
+from ordenes o
+left join vendedor ve on ve.id_vendedor = o.id_vededor
+group by ve.nombre: 
+
+#esta peticion indica que seleccionara el conteo de idcliente, la columna cliente de la tabla clientes y se agrupara por pais y que tome solo la cantidad de cliente que sean
+> 5 y y se agrupara por el conteo de idcliente de forma descendente/ el having funciona como el where pero como usamos el group by no podemos usarlo 
+select count(idcliente), pais
+from clientes group by pais
+having count(idcliente) > 5
+group by count(idcliente) desc;
+
+#esta peticion indica que seleccionara la columna nombre de v, el conteo del idorden de o sera como 'cantidad de ordenes' de la tabla ordenes como 'o' hara una union 
+compartidad con vendedor con alias 've' en donde o.idvendedor sea = a v.id_vendedor se agrupara por nombre y tomando en cuenta que el conteo de o de idorden sea > a 2
+#seleccionara solo donde nombre tenga un parecido con ana o nombre tenga un parecido con pedro
+select v.nombre, count(o.idorden) as "Cantidad de ordenes"
+from ordenes o
+inner join vendedor ve on o.id_vendedor = v.id_vededor
+·where nombre like '%Ana%' or nombre like '%Pedro%'
+group by nombre
+having count(o.idorden) > 2: 
+
+#esta peticion indica que seleccionara los campos ----m de la tabla empleados donde el sueldo sea >= a (la seleccion del promedio en sueldos de la tabla empleados)
+select id_empleado, nombre,apellido,sueldo
+from empleados where sueldo >=
+			    (select avg(sueldo)
+			    from empleados)
+
+#esta peticion indica que seleccionara los campos--- de la tabla clientes en donde idcliente este en (la seleccion de idcliente de la tabla clientes en donde pais sea ='mexico')
+#con el eny diria que traiga cualquier coincidencia den el ()
+select nombre,ciudad from clientes
+where id cliente in # = any
+		  (select idcliente from clientes)
+		  where pais = 'Mexico')
+
+#esta peticion indica que seleccione los campos ---- de facturas alias 'f' en donde exista (toda la seleccion de la tabla detalles alias 'd' donde f.numero sea = d.nume
+ero factura y d.articulo = 'lapiz') / si usamos el not va excluir lo que este en ()
+select cliente, numero, fecha
+from facturas f
+where #not# exists 
+	(select * from detalles d
+	where f.numero = d.numerofactura
+	and d.articulo = 'lapiz' )		
+
+#esta peticion indica que seleccionara las columnas ---, y si en la columna vendidos hay valores nulos entonces los seleccionara pero con el valor de 0 y a la nueva columna
+tendra un alias vendidos/ is null solo funcionara con el mismo tipo de dato /con coalesce es igual que el isnull
+select nomre,precio_unidad, isnull #coalesce(vendidos,0)
+as vendidos
+from productos;
+
+#esta peticionindica que sleecionara los campos --- y precio_unidad se le multiplicara los campos existencia + vendidos y si tienen nulos su valor sera 0
+select * nombre,precio_unidad * isnull (existencia + vendidos,0)
+as vendidos
+from productos
