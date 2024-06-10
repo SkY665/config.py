@@ -1,0 +1,1351 @@
+SELECT * FROM empleados;
+
+SELECT * FROM empleados where nombre = 'Jorge'
+#seleciona todos los datos de empleados donde la edad sea 29
+SELECT * FROM empleados where edad = '29'
+
+#limpia la tabla
+TRUNCATE TABLE empleados;
+
+#elimina los datos de empleadod donde el id sea 7
+DELETE from empleados where idEmpleado=7;
+
+#altera la tabla empleados agregando  la columna sexo donde su tipo de dato es char(1)
+ALTER TABLE empleados add sexo char(1);
+
+#altera la tabla empleados eliminando la columna feccontratacion sin importas sus datos porque no hay restriccion
+ALTER TABLE empleados DROP COLUMN fechaContratacion;
+
+#operadores
+<>,!= compara si dos valores son diferentes
+
+#seleciona todos los datos de empleados donde el idempleado sea igual a 3
+SELECT * FROM empleados WHERE idEmpleado = 3;
+
+#seleciona todos los datos donde la edad sea diferente a 25
+SELECT * FROM empleados WHERE edad != 25;
+SELECT * FROM empleados WHERE edad <> 25;
+
+#-- con doble guien se escribe comentario  y con /*se comentara todas las filas para abajo
+solo se ejecutara fom empleados y no donde este el comentario
+SELECT * FROM empleados --WHERE edad = 25
+#aca se establece que consultas van a ser solo comentario abriendo y cerrando
+/*SELECT * FROM empleados 
+WHERE edad = 25 ?;*/
+#este comando muestra toda las columnas existentes en la tabla empleados con su tipo de dato y todo
+exec sp_help empleados;
+
+#este comando cambia el nombre en la tabla empleados de idempleados por id
+EXEC sp_rename 'Empleados.idempleado', 'id' ;
+
+#esta peticion indica que actualize la tabla empleados y espablece la columna telefono a 8888335552 donde el id sea igual a 3
+update empleados set telefono = 8888335552 
+ where id = 3;
+
+#esta peticion indica que actualize la tabla empleados y espablese la columna activo a NO donde el id sea (1,3,5,7,9)
+update empleados set activo = 'NO' 
+ where id in (1,3,5,7,9);
+
+#esta peticion indica que selecione todos los datos de la tabla empleados donde la edad sea (25,31,34)
+ select * from empleados where edad in(25,31,34);
+
+#esta peticion indica que elimine de la tabla empleados donde el id sea (3,8,15)
+ delete from empleados where id in(3,8,15);
+
+#importacion de datos de una tabla a otra
+#esta peticion india que inserte dentro de la tabla salarios en los campos nombre apellido y salarios los  valores seleccionnado nombre apellido y salario desde la tabla empleados
+insert into salarios(nombre, apellido, salario)
+select nombre, apellido, salario from empleados;
+
+#esta peticion indica que inserte dentro de la tabla salarios en los campos nobre apellido y salarios los valores selecionados nombre apellido y salario desde la tabla empleados donde el salario sea mayor a 2500
+insert into salarios(nombre, apellido, salario)
+select nombre, apellido, salario from empleados
+where salario > 2500;
+
+#esta peticion indica que seleccione los primeros 5 registros de  toda la tabla empleados
+select top 5 * from empleados;
+
+#esta peticion indica que seleccione la mitad de registros de toda la tabla empleados 
+select top 50 percent * from empleados; 
+
+#esta peticion indica que seleccione los 3 primeros registros de toda la tabla empleados donde la columna activo sea no
+select top 3 * from empleados
+where activo = 'NO';
+
+#esta peticion indica que selecione todos los registos de la tabla clientes donde el nombre es NULL
+select * from clientes where nombre is null;
+
+#esta peticion indica que seleccione todos los registros donde el campo nombre es NOT NULL osea que no tenga ningun valor
+select * from clientes where nombre is not null;
+
+#esta peticion indica que actualize la tabla clientes y establezca el campo dirrecion con 'no tiene' donde la dirrecion es null
+update clientes set dirrecion = 'no tiene' 
+where dirrecion is null;
+
+#esta peticion elimina de clientes valores especificos y no todos donde el nombre es null
+delete from clientes where nombre is null;
+
+#borra la tabla clientes
+drop table clientes;
+
+#crear tablas
+create table clientes(
+	idcliente int not null,
+	nombre varchar(20) not null,
+	direccion varchar(100) not null,
+	telefono numeric(10) null,
+	email varchar(50) null,
+
+);
+
+#esta peticion indica que inser dentro de la tabla cliente los siguientes valores y que si la columna permite se pondra su valor como null
+insert into clientes values(2,'Manuel','calle segunda',null,null);  
+
+#con estsa dos peticiones podemos ahcer que una columna sea primary key
+create table personas(
+	idpersona int primary key,
+	nombre varchar(10) not null,
+	edad int not null,
+);
+o create table personas(
+	idpersona int ,
+	nombre varchar(10) not null,
+	edad int not null,
+	primary key(idpersona)
+);
+#esta peticion indica que quiere crear una regla llamada pk_enlace_persona que va ser de tipo primary key y se le va aplicar al campo idpersona
+create table personas(
+	idpersona int ,
+	nombre varchar(10) not null,
+	edad int not null,
+	constrain PK_enlace_persona primary key(idpersona)
+);
+
+#esto en caso de que ya hayamos creado una tabla y queramos establecer una primary key
+#esta peticion incdica que altere la tabla personas y agregue una regla PK_enlace que va ser primary key y que se le va apliacr al campo ya existente idpersona
+alter table personas 
+add constraint PK_enlacoe primary key(idpersona); 
+
+#esta  peticion indica que altere la tabla persona y elimine la regla PK_enlace	
+alter table personas drop constraint PK_enlace;
+
+#esta peticion indica las diferentes formas de crear una tabla agregando una regla unique que hace que todos los valores sean unicos
+create table Personas(
+	idpersona int not null #unique,
+	nombre varchar(10),
+	edad int
+#constarint UQ_idpersona unique(idpersona)
+);
+
+#esta peticion indica que altere la tabla personas agregando una relga UQ_persona y eslablecas como unique a la columna idpersona, pero a diferencia de la regla primary key la regla unique si permite valores null
+#pero para evitar eso lo podemos poner como not null al lado de unique cuando estemos creando la tabla
+alter table Personas
+add constraint UQ_idpersona unique idpersona
+
+#y esta peticion indica que altere la tabla personas y elimine la regla UQ_idpersona
+alter table Personas
+drop costraint UQ_idpersona;
+
+#esta peticion indica que se cree una tabla pero la regla check especifica o verifica que la edad tiene que ser >=18 y si no es asi no permitira otros valores que no sean esos 
+#esta peticion indica las diferentes formas de estaclecer a una tabla la regla check
+create table personas(
+	id int not null,
+	nombre varchar(10) ,
+	edad int #check(edad>=18),
+	#check (edad >=18  )
+	#constraint CK_edad check (edad>=18)
+);
+
+#esta peticion indica que se altere la tabla y agregue un check a la edad para que sea >=18 si no lo establecimos a la hora de crear la tabla
+alter table personas
+add check(edad>=18)
+
+#esta peticion indica que se alterara la rabla personas eliminando la regla CK_personas_edad_#### o con el nombre que le hayamos dado
+alter table personas
+drop constreint CK_personas_edad_###### 
+
+#esta peticion indica que se crea una tabla y se crea una tabla ciudad donde si no tiene un valor asignido se le asisgara por defecto no tiene
+#estas son diferentes porfas de establecer un default
+create table personas(
+	idpersonas int not null,
+	nombre varchar(10),
+	edad int not null,
+	ciudad varchar(50) #default 'no tiene'
+);
+
+#default es una regla que establece un valor por defecto a una tabla si no tiene ningun  valor
+#esta peticion indica que se altere  la tabla personas y se agregue el contraint DF_ciudad estableciento la reglra default 'no tiene' para la columna ciudad en caso de que no la hayamos establecido cuando creamos la tabla
+alter table personas 
+add constaint DF_ciudad
+default 'no tiene' for ciudad;
+
+#esta peticion indica que se altere la tabla personas y se elimine la regla DF_ciudad
+alter table personas 
+drop constraint DF_ciudad;
+
+#identity es una regla que indica que su valor aumentara automaticamente
+#esta peticion indica que se creara una tabla pero el codigo estara con una regla identity donde no sera necesario insertar un valor en esa tabla porque se aumentara en 1 automaticamente
+#tambien indica que se empezara desde el 10 y se aumentara de 1 en 1
+create table libros(
+	codigo int identity #(10,1),
+	titulo varchar(60) not null,
+	autor varchar(60) not null
+);
+#esta peticion nos nos selecionara el valor en se empieza en nuestra tabla libros
+select ident_seed('libros');
+#y esta peticion nos seleccionara el valor con el que se incrementa
+select ident_incr('libros');
+
+#esta peticion establece que podamos poner nuevos valores sin inportar que sea identity porque lo esta desactivando y con off la activa
+set identity_insert libros on #off;
+
+#esta peticion indica que creara una vista Clientes_Nacionales y sera como un alias de seleccionar todo de clientes
+#una vista es como una tabla temporal de lo que solo queremos ver
+create view Clientes_Nacionales
+as 
+select * from clientes;
+
+#esta peticion indica que se creara una vista Mayores_30 seleccionando nombre, apellido, telefono, edad de la tabla clientes donde edad > 30
+create view Mayores_30
+as 
+select nombre, apellido, telefono, edad
+ from clientes where edad > 30;
+
+#esta peticion indica que se alterara la vista Mayores_30 agregando la columna fecha nacimiento de la tabla clientes donde edad>30
+alter view Mayores_30
+as 
+select nombre, apellido, telefono, edad, fecha_nacimiento
+ from clientes where edad > 30;
+
+#con esta pelicion se elimina la vista mayores_30
+drop view mayores_30;
+
+#esta ptecicion indica que se creara un un indice clausterizado llamado I_idempleado en la tabla empleados en la columna id
+#asi se le puede agregar un indice a dos o mas tabla pero lo recomendado es 2 nomas
+create clustered index I_idempleado
+on empleados (id #,salario);
+
+#esta peticion indica que se creara un indice no clausterizado llamado I_edad_empledo en la tabla empleados en la columna edad
+create  nonclustered index I_edad_empleado
+on empleados (edad);
+
+#esta peticion indica que se cambiara el nombre del indice I_idempleado de la tabla empleados por I_id 
+exec sp_rename 'Empleados.I_idempleado', 'I_id', 'INDEX';
+
+#esta peticion indica que se eliminara el indice I_id de la tabla empleados
+drop index I_id on Empleados;
+
+#esta peticion selecionara los valores dististons de la columna pais de la tabla clientes 
+select distinct pais from clientes;
+
+#esta peticion selecionara los valores distintos de la columna id_cliente de la tabla clientes donde pais sea igual = 'Argentina'
+select distinct id_cliente from clientes
+where pais = 'Argentina';
+
+#esta peticion seleccionara los valores distintos de la columna pais donde las compras seas null
+select distinct(pais) from clientes
+where compras is null;
+
+#esta peticion indica que seleccionala las columnas id nombre y apellido y salario pero a id se le aplicara un alias como IDENTIFICADOR para su mejor identificacion
+#para que tengan un espacio tiene que tener commilas asi as "primer nombre"
+select id as Identificador, nombre #as Primer_nombre, apellido as Primer_apellido, salario from Empleados
+where salario < 3000;
+#esta peticion indica que se seleccionaran las columnas nombre y appelido y se concatenara de la tabla empleados, solo servira para datos que sean el mismo tipo de dato
+# para que sea lejible se le tiene que agregar comillas asi + '' + y se le puede poner cualquier caracter para separarlo ya sea -, o cualquiera
+select nombre + apellido from empleados;
+selcct nombre + ' ' + apellido from empleados;
+#esta peticion indica que seleccionara las columnas nombre edad y apellido pero a edad usando el comando cast se le convertira al tipo de dato varchar(2) para poder realizar la concatenacion correctamente de la tabla empleados
+#y la la nueva columna tendra el nombre de Datos
+select nombre + ' ' + apellido + ' ' + 
+cast(edad as varchar(2)) as "Datos de empleados" from empleados;
+ 
+#esta peticion seleccionara las columnas nombre , descripcion y precio pero se creara una nueva columna que tenra el alias Nuevo Precio que tendra un aumento del 10% del precio original y seria asi precio + (precio * 0.1)
+select nombre, descripcion,
+precio + (precio * 0.1) as "Nuevo Precio" from articulos;
+
+#esta peticion indica que seleccionara las columnas nombre descripcion y precio pero se creara una nueva columna por que la columna original no tiene la operacion aritmetica llamada descuento que tendra el descuento del 10% del precio original y sera asi precio - (precio * 0.1)
+select nombre, descripcion,
+precio - (precio * 0.1) as "Descuento" from articulos;
+
+#esta peticion indica que seleccionara la columna nombre, descripcion, y que hara una operacion en el precio por la cantidad y se le asisgnara a la nueva columna costo total de la tabla articulos 
+select nombre, descripcion,precio * cantidad as "Costo total" from articulos;
+
+#esta peticion indica que se seleccionara las columnas nombre descipcion y precio y se creara una nueva columna con el precio * vendidos y se llamara ventas que sera el total de ventas de esos productos
+select nombre, descripcion,
+precio * vendidos as "ventas" from articulos;
+
+#esta columna indica que se seleccionara la columna nombre,descipcion y cantidad pero se realizara una operacion, cantidad - vendidos y se le asisgana a la nueva columna creada llamada Exsistencia de la tabla productos
+#algunos valores quedaran en negativo devido a que la cantidad es menor al valor vendido 
+select nombre, descripcion,
+cantidad - vendidos as Exsistencia from articulos;
+
+#con esta peticion creamos un nuevo esquema llamado ventas 
+create schema ventas;
+#esta peticion indica que se creara una nuevla tabla llamada clientes en el esquema ventas
+create table ventas.clientes(
+idclientes int,
+nombre int,
+dirrecion varchar(30)
+);
+
+#esta peticion indica que se elimine la tabla cobros del esquema ventas
+drop table ventas.cobros;
+
+#esta peticion indica que seleccionara todas las columnas de empleados ordenados por la columna edad en orden ascendente
+#el comando asc indica que se ordenara los datos de menor a mayor o en orden ascendente, el comando desc es para descendente
+select * from empleados order by edad #asc;
+
+#esta peticion indica que ordenara los datos por activo pero empezara por el NO por ordne alfabetico porque es pordefecto
+#emcambio si le ponemos el desc lo hara de la forma contraria alfabeticamente
+select * from empleados order by activo #desc;
+
+#esta peticion indica que seleccionara todos los datos de la tabla empleados donde la edad sea mayor a 25 ordenados por la edad pero de manera que esta por defecto
+select * from empleados
+where edad > 25 order by edad;
+
+#esta peticion indica que seleccionara los campos de la tabla empleados y seran ordenados por la edad y salario por defecto porque no esta especificado 
+#al utilizar los comandos desc y asc se utilizara el que esta primero porque el sistema prioriza la congruencia de los datos
+select nombre, apellido, edad , salario from empleados
+order by edad #desc, salario #asc;
+
+#esta peticion seleccionara el dato mas caro de la columna precio de la tabla articulos
+#esta otra el damo menos caro o el dato con el valor mas bajo
+select min(precio) as Mas_Barato from articulos;
+select max(precio) as Mas_Caro from articulos;
+
+#esta peticion seleccionara el dato bajo y el mas caro y se le asignara un alias de la tabla articulos
+select min(precio) as Mas_Barato 
+       max(precio) as Mas_Caro
+       from articulos;
+
+#esta peticion seleccionara en el caso de el tipo de dato varchar o caracter el dato con la letra del alfabeto mas alto osea el que este as cerca de la ultima letra
+# y si se le cambia a min seleccionaria el dato con el caracter mas bajo del alfabeto que esta en la tabla articulos
+select max(nombre) from articulos;
+
+#esta peticion contara todos los registros en una columna con el alias cantidad de la tabla empleados 
+select count(*) as Cantidad from Empleados;
+
+#esta peticion indica que contara los registros de la columna sueldo de la tabla empleados donde el puesto sea el de asistente
+select count(sueldo) from Empleados
+where puesto = 'Asistente';
+
+#esta peticion indica seleccionara y  sumara todos los registros de la columna sueldo de la tabla empleados y estara en una columna con el alias total
+#mientras el puesto sea el de asistente
+select sum(sueldo) as Total from empleados;
+#where puesto = 'Asistente';
+
+#esta peticion indica que seleccionara el promedio de la columna sueldo de la tabla empleados
+#y solo seleccionara el promedio de sueldo mientras el puesto sea gerente
+select avg(sueldo) from empleados;
+#where puesto = 'Gerente';
+
+#esta peticion indica que seleccionara el promedio de la columna sueldo pero de valores que seran distintos en la tabla empleados
+o sea que para hacer el calculo del promedio solo se usaran valores dinstintos 
+select avg(distinct sueldo) from empleados;
+
+#esta peticion indica que sumara todos los valores distintos de la columna sueldo y cant_hijos y tendran sus alias de la tabla empleados 
+select sum(distinct sueldo) as Total_Sueldos, sum(cant_hijos) as total_hijos
+ from empleados;
+
+#esta peticion indica que va contavilizar todos los registros y tendra un alias registros, se hara un promedio de la columna sueldo y tendra un alias promedio_sueldo y
+sumara los valores en la columna cant_hijos y tendra un alias total_hijos de la tabla empleados mientras el id sea 1,3,5,8
+select count(*) as registros, avg(sueldo) as promedio_sueldo,
+sum(cant_hijos) as total_hijos from empleados
+where id_empleado in (1,3,5,8);
+
+#esta peticion indica que seleccionara todos los datos de la tabla clientes mientras el pais sea italia y la ciudad sea roma
+#si se una el comando and o Y las dos consultan tienen que ser verdad o tienen que ser verdad
+select * from clientes
+where pais = 'Italia' and ciudad = 'Roma';
+
+#esta peticion seleccionara todos los datos de la tabla clientes mientras la ciudad sea roma o venecia
+#al utilizar el comando or solo una de las dos conlustas debe ser verdad o sea una nomas tiene que cumplirse pero si son las nos no hay problema
+select * from clientes
+where ciudad = 'Roma' or ciudad = 'Venecia' ;
+
+#esta peticion indica que seleccionara todos los registros de la tabla clientes mientras el pais no se alemina y no sea tampoco canada
+select * from clientes
+where not pais = 'Alemania', and not pais = 'Canada' ;
+
+
+#betwenn sirve para consultar valores pero en un rango especifoco similar a un range(1,8)
+#esta peticion indica que seleccionara todos los datos de la tabla empleados mientras id_empleado este en el rango de 1 y 7
+select * from empleados
+where id_empleado 
+between 1 and 7;
+
+#esta peticion indica que seleccionara todos los datos de la tabla empleados mientras el id_empleado este en el rango de 1 y 7 o cant_hijos este en el rango de 5 y 8
+#en este caso hara caso al del rango de 1 y 7 pero si el otro esta en un rango de 1 y 8 traera el de los hijos porque solo puede hacer una de las dos peticiones
+select * from empleados
+where id_empleado 
+between 1 and 7 or cant_hijos between 5 and 8;
+
+#esta peticion indica que seleccionara todos los datos de la tabla empleados mientras el sueldo este entre 2000 y 4000 y el puesto que no sea Desarrolador y tecnico 
+select * from empleados
+where sueldo between 2000 and 4000
+and puesto not in('Desarrolador', 'tecnico');
+
+#esta peticion  indica que seleccionara todos los datos de la tabla empleados mientras el pais este entre alemania y canada alfabeticamente o la primera letra osea A y C
+y solo traera datos de la letra a b y c y ningun otro dato que no tengan estas iniciales, y se ordenara alfabeticamente por el pais
+select * from empleados
+where pais between 'Alemania' and 'Canadá'
+order by pais;
+
+#esta peticion indica que seleccionara todos los datos mientras la fecha_contratacion este entre '1996-07-01' y '2003-05-06' y seran ordenados por la fecha de 
+de contratacion de manera por defecto
+select * from empleados
+where fecha_contratacion between '1996-07-01' and '2003-05-06'
+order by fecha_contratacion;
+
+#esta peticion indica que seleccione todos los datos mientras nombre comiente con A, y si se pone el % seleccionaran todos los datos que terminan con A
+# si esta asi %A% traera todos los datos que tengan una A
+# si esta _a% asi traera todos los datos que tengan una a como segundo caracter, si es --a% traera el que este en el tercer caracter la a, depende de cuantos -utilizemos
+# si esta asi a_% traera todos los datos que tengan de penultimo caracter la a, a%o si esta asi traera los datos que tengan una a en el primer caracter y una o en el ultimo caracter
+select * from clientes
+where nombre like 'A%';
+
+#esta peticion indica que seleccionara todos los datos mientras la columna nombre no tenga como 2do caracter la a 
+select * from clientes
+where nombre not like '_a%';
+
+#esta peticion indica que seleccionara de la tabla ordenes id_orden , de la tabla clientes la columna nombre de la tabla ordenes y hara un enlace interno en donde la 
+columna idcliente de la tabla ordenes sea igual a la columna idcliente de la tabla clientes/osea d elos valores que comparten ambas tablas
+
+select ordenes.id_orden, clientes.nombre
+from ordenes 
+inner join clientes on ordenes.idcliente = clientes.idcliente;
+
+#esta peticion seleccionara de la tabla ordenes la columna id_orden, de la tabla clientes la columna nombre, la columna appelido, y de la tabla orden la columna  fecha_orden
+de la tabla ordenes y hara un enlace interno de clientes en donde la tabla ordenes la columna idclientes sea = a la columna cliente de la tabla clientes mientras el nombre sea juan y sera ordenado por la fecha_orden;
+select ordenes.id_orden, clientes.nombre, clientes.apellido, orden.fecha_orden 
+from ordenes 
+inner join clientes on ordenes.idcliente = clientes.idcliente;
+where nombre = 'Juan', order by fecha_orden;
+
+#esta peticion indica que seleccione el nombre de la tabla clientes, el apellido y el id_orden de la tabla orden de la tabla clientes y haga un enlace izquierdo donde 
+ordenes en idcliente de la tabla clientes sea = ordenes.idcliente/seleccionara los datos del enlace izquierdo y los que comparte con la otra tabla/y seran ordenados por
+fecha_orden de manera por defecto/ la tabla 1-de la izquierda seria clientes y la de la derecha ordenes
+select clientes.nombre, clientes.apellido, orden.id_orden 
+from clientes 
+left join ordenes on clientes.idcliente = ordenes.idcliente;
+#where nombre = 'Juan'#, order by fecha_orden;
+
+#esta peticion hace lo mismo que arriba solo que se le esta poniendi un alias a la tabla clientes por cli y a la tabla ordenes ord
+select cli.nombre, cli.apellido, ord.id_orden, ord.fecha_orden 
+from clientes cli
+left join ordenes ord on cli.idcliente = ord.idcliente;
+ord by fecha_orden;
+
+#esta peticion indica que seleccionara id_orden de la tabla clientes, nombre y apellido de la tabla clientes De la tabal clientes y hara un enlace derecho de ordenes 
+en id.cliente de la tabla ordenes sea = a id_cliente de la tabla clientes/la de la derecha es la tabla ordenes y de la izquierda la tabal clientes y traera todos los datos de la tabla ordenes y los datos donde 
+haya coincidencias en la tabla clientes 
+
+select orden.id_orden, clientes.nombre, clientes.apellido,  
+from clientes 
+right join ordenes on ordenes.idcliente = clientes.idcliente;
+order by ordenes.id_orden;
+
+#seleccionara todos los datos de las dos tabla y sus columnas seleccionadas y se ordenara por id_orden de la tabla ordenes/todo mientras lo especifique en el select
+select orden.id_orden, clientes.nombre, clientes.apellido,  
+from clientes 
+full join 
+ordenes on ordenes.idcliente = clientes.idcliente;
+order by ordenes.id_orden;
+
+#esta peticion indica que seleccionara los campos de las dos tabla y hara una union de todo lo seleccionado/las columnas deben ser iguales en las dos tabla como sus tipos
+de datos y es una alternativa a un join y se ordenara por el pais / si se le agrega el all se puede ver incluso los datos duplicados de los dos select  
+#se le esta agregando una columna llamada tipo donde se podra ser de que tabla es la fila 
+select # 'Cliente' as Tipo ,#contacto, ciudad, pais  from clientes
+union #all
+select #'Suplidor' as Tipo ,#contacto, cuidad, pais from suplidores
+order by pais;
+
+#seleccionaran las columnas ciudad y pais de la tabla clientes y suplidor mientras el pais sea = 'Mexico'/tambien se vera la columna tipo mostrando de donde es la fila
+select # 'Cliente' as Tipo ,#ciudad, pais  from clientes where pais = 'mexico'
+union #all
+select #'Suplidor' as Tipo ,#cuidad, pais from suplidores where pais = 'Mexico';
+
+
+#esta peticion indica que seleccionara un contedeo de idcliente, seleccionara la columna pais de la tabla clientes y se agrupara por pais y se ordenara de forma ascendente	
+select count(idcliente) as Cantidad , pais
+from clientes 
+grup by pais order by count(idcliente);
+
+#esta peticion indica que seleccionara el idcliente maximo que tendra el alias cantidad,tambien seleccionara pais de la tabla clientes y se agrupara por el pais y se ordenara por el conteo del idcliente
+#si se usa min se mostrara los idcliente minimo de cada pais seleccionado/si se usa avg sumara todos los idcliente y se hara su promedio de su campo para el pais
+select max(idcliente) as Cantidad , pais
+from clientes 
+grup by pais order by count(idcliente);
+
+#esta peticion indica que seleccionara de v.nombre, contara los registros de idorden.delatablao como cantidad de ordenes de la tabla ordenes alias 'o' se hara un enlace izquierdo
+de la tabla vendedor alias 've' en donde ve.id_vendedor sea = o.id_vendedor y se agrupara por ve.nombre
+select ve.nombre, count(o.idorden) as "Cantidad de ordenes"
+from ordenes o
+left join vendedor ve on ve.id_vendedor = o.id_vededor
+group by ve.nombre: 
+
+#esta peticion indica que seleccionara el conteo de idcliente, la columna cliente de la tabla clientes y se agrupara por pais y que tome solo la cantidad de cliente que sean
+> 5 y y se agrupara por el conteo de idcliente de forma descendente/ el having funciona como el where pero como usamos el group by no podemos usarlo 
+select count(idcliente), pais
+from clientes group by pais
+having count(idcliente) > 5
+group by count(idcliente) desc;
+
+#esta peticion indica que seleccionara la columna nombre de v, el conteo del idorden de o sera como 'cantidad de ordenes' de la tabla ordenes como 'o' hara una union 
+compartidad con vendedor con alias 've' en donde o.idvendedor sea = a v.id_vendedor se agrupara por nombre y tomando en cuenta que el conteo de o de idorden sea > a 2
+#seleccionara solo donde nombre tenga un parecido con ana o nombre tenga un parecido con pedro
+select v.nombre, count(o.idorden) as "Cantidad de ordenes"
+from ordenes o
+inner join vendedor ve on o.id_vendedor = v.id_vededor
+·where nombre like '%Ana%' or nombre like '%Pedro%'
+group by nombre
+having count(o.idorden) > 2: 
+
+#esta peticion indica que seleccionara los campos ----m de la tabla empleados donde el sueldo sea >= a (la seleccion del promedio en sueldos de la tabla empleados)
+select id_empleado, nombre,apellido,sueldo
+from empleados where sueldo >=
+			    (select avg(sueldo)
+			    from empleados)
+
+#esta peticion indica que seleccionara los campos--- de la tabla clientes en donde idcliente este en (la seleccion de idcliente de la tabla clientes en donde pais sea ='mexico')
+#con el eny diria que traiga cualquier coincidencia den el ()
+select nombre,ciudad from clientes
+where id cliente in # = any
+		  (select idcliente from clientes)
+		  where pais = 'Mexico')
+
+#esta peticion indica que seleccione los campos ---- de facturas alias 'f' en donde exista (toda la seleccion de la tabla detalles alias 'd' donde f.numero sea = d.nume
+ero factura y d.articulo = 'lapiz') / si usamos el not va excluir lo que este en ()
+select cliente, numero, fecha
+from facturas f
+where #not# exists 
+	(select * from detalles d
+	where f.numero = d.numerofactura
+	and d.articulo = 'lapiz' )		
+
+#esta peticion indica que seleccionara las columnas ---, y si en la columna vendidos hay valores nulos entonces los seleccionara pero con el valor de 0 y a la nueva columna
+tendra un alias vendidos/ is null solo funcionara con el mismo tipo de dato /con coalesce es igual que el isnull
+select nomre,precio_unidad, isnull #coalesce(vendidos,0)
+as vendidos
+from productos;
+
+#esta peticionindica que sleecionara los campos --- y precio_unidad se le multiplicara los campos existencia + vendidos y si tienen nulos su valor sera 0
+select * nombre,precio_unidad * isnull (existencia + vendidos,0)
+as vendidos
+from productos
+
+#esta peticion indica que seleccionara los camnos ---- y en caso de que cuando el campo cantidad sea > 30 entonces mostrara 'Articulo con sobre.exsistencia' y asi con la siguiente when, sino cumple ninguna mostrara 'existencia normal',finalizara el case y todos los casos estaran en un campo Inventario de la tabla articulos  
+select nombre,cantidad,
+case 
+  when cantidad > 30 then 'Articulo con sobre-existencia'
+  when cantidad < 10 then 'Se deve realizar pedido'
+  else 'Existencia normal'
+  end as Inventario
+from articulos;
+
+#esta peticion indica que seleccionara los campos ---- de la tabla clientes y se ordenara en caso de que cuando ciudad is null entonces sera el campo pais lo organizara y sino sera sigue el campo ciudad 
+select nombre, ciudad, pais
+from clientes
+order by 
+(case
+  when ciudad is null then pais
+  else ciudad
+end);
+
+#con ceiling redondeara al siguiente numero si hay decimal/en numeros negativos solo eliminara los decimales
+select ceiling(123.45) as redonded
+select floor(123.45);     /solo dejara el 123 y eliminara el 45/en caso de los negativos los redondeara al siguiente
+
+#si esta con 0 el 123 sera 123.00,cambiara cualquier decimal a ese numero/ si en el . esta un .50 a mas redondeara al soguiente numero/redondeo de cifras con aproximacion
+select round(123.45, #0 , 1)
+select round(123.5666,1 ) /redondeara asi 123.6000/si es 7 sera asi 123.5700/3 sera 123.5670 
+
+#el power esta haciendo una potencia 4 elevado a 2 asi cualquier cifra/calculo de potencicacion de crifra
+select power(4,2)
+
+#esta peticion trae valores random en un rango de 100 y guion- 1/funcion rand() para numeros aleatorios
+select rand() *(100-1)
+select floor(rand()*(1oo-1)) as aleatorio/borara los decimales del random
+
+#esta seleccionando el seno de 45 grados/se puede usar el floor/calculo de coseno  seno de angulos 
+select sin(45) as angulo ;
+
+#esta peticion realiza la raiz del numero  
+select sqrt(81) as raiz;
+
+#esta peticion seleccionara el campo nombre y se le concatenara el valor del char(65)/que es la a/indica el caracter  
+select nombre +' '+ char(65) as nombres from empleados;
+
+#concatenara los de () 
+select concat('hola','a','todos') as saludo;
+
+#seleccionara el tamaño de largo del ('') contando espacios/funcion para contar caracteres y espacios  
+select len('SQLserver');
+
+#el upper y lower /upper los convertira a mayusculas y el lower a minusculas
+select upper('hola a todos');
+
+#selecciona y convierte a mayuscula del dato izquierdo 'hola a todos ' el caracter 1o,h ,tambien en minuscula pero del lado derecho de 'hola a todos ' y del tamaño de la palabra eliminara el 1mer caracter/traer 1ra letra en mayuscula 
+select concat(upper(left('hola a todos',1)),
+lower(right('hola a todos',len('hola a todos')-1)))
+
+#itrim elimina los espacios desde la izquierda/rtrim corta espacios desde la derecha/trim corta de ambos lados
+select ltrim('           hola a todos');
+
+#replace reemplaza caracteres/ el o en la palabra por la a
+select replace('el cocobongo','o','a')
+
+#el translate traslada abc por 000/mientras en el primer '' selecione cuantos caracteres
+select traslate('abcdef','abc','000')
+
+#esta peticion indica que va a trasladar del ([]) la coma y lo cambiara por un espacio
+select translate('[123.4,72.3]', '[,]','( )' as punto);
+
+#replicara 10 veces el 0 multiplicara caracteres 
+select replicate('0',10);
+
+#seleccionara el dato al revez
+select reverse('SQLserver') as alreves
+
+#al seleccionar la fecha agregara un dia mas al dia/fecha a dias posteriores agregados 
+select dateadd(day,1,getdate())/vale con negativos tambien y da dias anteriores
+select getdate() as fecha;
+
+#agregara dos meses a la fecha actual
+select dateadd(month,2,getdate());
+
+#agregara dos años a la fecha actual
+select dateadd(year,2,getdate());
+
+#agregara 3 horas a la fecha actual
+select dateadd(hour,3,getdate());
+
+#agregara 3 minutis
+select dateadd(minute,3,getdate());
+
+#esta peticion indica que seleccionara todos los datos de facturas mientras fecha sea entre 'fecha' y un año en adelante de la fecha 'fecha'/ y asi con cualquier fecha o hora/ es mas practico con getdate si quieres desde ka fechactual
+select * from facturas
+where fecha between '2018-01-01'
+and dateadd(year,1,'2018-01-01');
+
+#selecciona el nombre del mes 
+select datename(month,getdate()) as Mes;
+set lenguage spanish/establece el idioma español para las fechas
+
+#muestra el mes del año ne numero/si se cambia a day mostrara el dia/con weekday dira el nombre del dia 
+select datepart(month,getdate())as mes;
+
+#selecciona los campos --------- y el nombre del mes del campo fecha de facturas mientras el nombre des mes sea = al nombre del mes actual
+select cliente,fecha,datename(month,fecha)
+from facturas 
+where datename(month,fecha) = datename(month,getdate())
+
+#selecciona los dos primeros caracteres de email de e_mails del lado izquierdo/con el right trae del lado de la derech
+select left(email,2)
+from e_mails;
+
+select right(email,11) as caract /seleccionara los 11 caracteres del lado derecho al izquiero del campo emailde e_mail
+from e_mails order by caract desc;/y se oreara por carac de forma descendente  
+
+#corta y desde 3cer caracter quite 5 catacteres y agregara amigos 
+select stuff('hola a todos', 3, 5, 'amigos');
+
+#transac-sql comandos 
+#
+create table autos(                    |bulk insert 
+  marca varchar(20),                   |autos 
+                                      |from #ruta y debe estar en formato .txt si esta en hoja de calculo#
+  modelo varchar(20),                  |with (firstrow = 2);
+                                       |ejemplo from 'c:/user//////tabalautos.txt';
+  tipo varchar(20),                    |
+  color varchar(20),               |que haga un bolcado de instertos para la tabla autos de la ruta con la1rafila=2 
+);
+
+#selecciona todos los valores de la seleccion del numero de filas sobre la ordenacion de las filas por a.ven_ult_anio 
+alias contador, junto con los campod a.idvendedor,a.ven_lt_anio de ventas alias a donde a.contador sea = 1  
+select * from (
+               select row_number() over(order by a.ven_ult_anio) as contador,
+              a_idvendedor, a.ven_ult_anio from ventas a) as a
+              where a.contador = 1;
+
+#selecciona el primer valor de a,idvendedor y encima ordenalo por a.ven_ult_anio de forma desc 
+select first_value(a.idvendedor) over(order by a.ven_ult_anio desc) as contador
+      ,a.idvendedor, a.ven_ult_anio
+from ventas a;
+/selecciona todos los valores de ventad alias a mientras a.idvendedor = (seleccion de un valor distintodel primer valor de (a.idvendedor)y encima ordenalo por a.ven_ylt_anio de forma desc) alias contador de ventas alias a
+select * from ventas a 
+  where a.idvendedor = (
+                      select distinc first_value(a.idvendedor)
+                      orver(order by a.ven_ult_anio desc) as contador
+                      from ventas a)
+
+#declare es = a variables/begin es = codigo principal o control de eventualidades/end  
+#begin palabras cavles / if-else, reutrn, waitfor, while, case, continue, do while 
+#control de eventualidades  break continue
+
+#indica que si existe valores la seleccion de todos  los articulos en donde cantidad sea = 0 entonces selecciona nombre,precio cantidad de articulos en donde sea = 0 sino seleccionara el mensaje no hay articulos en 0
+
+if exists (select * from articulos where cantidad = 0)
+  (select nombre, precio,cantidad
+  from articulos where cantidad = 0)
+  else 
+    select 'no hay articulos en 0' as Resultado;
+
+#si el objeto prube tiene valores que sean no sean nullos borra la tabla 
+if object_id('PRUBEA') is not null 
+  drop table prueba;
+
+#is existe los valores en la seleccion de todos los valores de la tabla carteleras en donde la capacidad>entradas 
+entonces selecciona las columnas sala,pelicula,hota,ylaoperacion con alias disponibles de carteleras en donde capacidad > entradas 
+if exists (select * from cartelera where capacidad > entradas)
+  select sala,pelicula,hora, (capacidad - entradas) as "disponible(s)"
+  from cartelera 
+  where capacidad > entradas 
+  else 
+    select 'entradas agotadas';
+
+#declaracion de variables/reglas comienza por @nombre - asi se declara una valiable  
+#declaracion de variables/ para varias valiables se declaran con un coma tambien en la declaracion  
+declare 
+  @valor1
+  @nombre varchar(20),/almacenara caracteres con el maximo tamaño a 20 
+  @id_valor int,
+ @telefono  numeric(10);
+ @activo bit,
+ @id_valor2 int = 35, /se puede declarar un valor ya en la seccion declare tambien en las 2 
+/no variale globales ni locales/se esta creando un contenedor vacio aun sin un valor  
+#begin/ establece en la variable @id_valor el valor de 50 
+begin 
+  set @id_valor = 50;/si el valor va cambiar contantemente esta manera es mejor 
+  set @nombre = 'SQLServer';
+  ser @telefono = 12234567;
+  set @fecha_nac = '1980/10/01';/ 0 1980-10-01
+  set @activo = 'true'; / si es true mostrara 1 si es false 0 
+  
+#select @id_valor as valor, @nombre as nombre; /seleccionara a la variable su valor 
+
+#declara la variable @ codigo como entero con un valor = 10 y dice selecciona todos los valores de articulos en donde 
+codigo sea = la variable @codigo 
+declare 
+  @codigo int = 10;
+  #@patron varchar(20);/crea una variable que permite 20 caracteres 
+  #@mayorprecio decimal(6,2);/crea una variable decimal con 6 valores enteros y 2 decimales  
+begin 
+  select * from articulos where codigo = @codigo;
+  #set @patron = '%Lap%';/la variable tendra los caracteres lap
+  #select * from articulos where nombre like @patron;/selecciona todos los valores de articulos en donde nombre coninc  #ida con @patron la variable
+  #select @mayor precio = max(precio) from articulos;/selecciona la variable y que sea = valormaximo de (precio) de la tabla  
+  #select * from articulos where precio = @mayorprecio;/selecciona todos los valores mientras precio = variable 
+
+end;
+
+#
+declare  /se esta creando una variable de tipo tabla con sus columnas/no se creara dicha tabla aun solo se declara 
+  @tabla1 table (
+    id int,
+    nombre varchar(20),
+    telefono numeric(10)
+  );
+  insert into @tabla1 values(1,'jose',123456) va dar erorr tiene que ser seleccionado junto al declare 
+
+#se esta creando un procedimiento (nombre) y hara la funcion declarada 
+create proc p_existencia 
+as 
+  select * from articulos 
+  where cantidad <=20;
+
+exec p_existencia;/ ejecutara la funcion para la tabla articulos 
+
+#crea un procedimiento con la funcion de que / si existen valores en la seleccion de todos los valores de arituculos 
+en donde la cantidad = 0 entonces actualiza articulos y establece la cantidad = 10 en donde la cantidad sea = 0  
+create procedure p_actualiza_inventario 
+as 
+begin 
+  if exists(select * from articulos 
+    where cantidad = 0)
+    update articulos set cantidad = 10 
+    where cantidad = 0;
+end
+
+exec p_actualiza_inventario / ejecutara el procedimiento con su funcion 
+
+#crea un procedimientoen en donde si existe valores en la seleccion de todos los valores de empleados en donde la cant_hijos > 3/hara otro bloque de codigo en donde actualizara empleados y establece sueldo = sueldo * 0.20 e imprimira 'mensaje' y terminara el bloque sino en otro bloque imprimira el siguiente mensaje ''
+
+create proc p_bonificacion 
+as 
+  begin 
+    if exist(select *from empleados 
+      where cant_hijos > 3 )
+    begin/ programacion en base de datos con bloques anidados 
+    update empleados set sueldo = sueldo * 0.20;
+    print 'se ha aplicado la bonificacion!';
+    end 
+    else 
+      begin 
+      print 'no hay empleados con mas de 3 hijos ';
+      end
+  end;
+exec p_bonificacion / ejecuta el procemidiento 
+
+#procemidientopara borar y actualizar 
+#asi se altera-actualiza un procedimiento que ya fue declarado 
+alter proc p_bonificacion 
+as 
+  begin 
+    if exist(select *from empleados 
+      where cant_hijos > 1 )
+    begin/ programacion en base de datos con bloques anidados 
+    update empleados set sueldo = sueldo * 0.20;
+    print 'se ha aplicado la bonificacion!';
+    end 
+    else 
+      begin 
+      print 'no hay empleados con mas de 3 hijos ';
+      end
+  end;
+
+drop procedure p_existencia;/borra el procedimiento 
+
+#parametros de entrada y salida
+#crea un procedimiento y crea una varibable con su valor y ejecuta la seleccion de todos los empleados donde nombre = 
+@nombre la variable 
+create procedure p_busca_emple
+  @nombre varchar(30) = 'Carlos'
+as 
+  select * from empleados 
+          where nombre = @nombre;
+
+exec p_busca_emple; / ejecutael procemidimento 
+
+#indica que se cree o se altere el procedimiento para su ejecucion 
+create or alter procedure p_busca_emple
+  @nombre varchar(30) = 'Juan'
+as 
+  select * from empleados 
+          where nombre = @nombre;
+
+# crea o altera un oricedimiento, declara las variables y seleccionara todos los empleados mientras nombre = @nombre 
+y sueldo = @sueldo y cant_hijos = @hijos 
+create or alter proc p_busca_emple_2
+  @nombre varchar(30) = 'Javier',
+  @sueldo int = 1000.00,
+  @hijos int = 3 
+as 
+  select * from empleados where 
+                        nombre = @nombre and sueldo = @sueldo 
+                        and cant_hijos = @hijos;
+  
+  exec p_busca_emple_2;/ ejecuta el procedimiento 
+
+#parametros de salida 
+#crea o altera un procedimiento con sus variables y establece al avariable resultado para que sea unasalida de datos 
+y seleccciona las y mostrara la variable y realiza una operacion con las variables 
+create or alter proc p_promedio
+  @valor1 numeric(6,2),
+  @valor2 numeric(6,2),
+  @resultado numeric(6,2) output / asi indica que esta variable sera un parametro de salida 
+as 
+ select @resultado = (@valor1 + @valor2) /2;
+
+declare   / se declara una variable y se ejecutara dandole valores y definiendole como salida y selecciona la variable
+  @promedio numeric(6,2)   / 6 valores enteros y 2 decimales 
+  exec p_promedio 1234.20, 7894.30,
+  @promedio output 
+  select @promedio as promedio ;
+
+#crea o altere un procedimiento se define las variables 2 son de salida y selecciona todos los valores de empleados 
+en donde el puesto tenga un parecido al valor de la variable @puesto, selecciona la variable @suma y que sea = a la 
+suma de todos los registros de sueldo de empleados y en donde el puesto tenga un parecido a la variable @puesto, 
+selecciona la variable @promedio y que sea = al promedio de los valores de sueldo de empleados mientras el puesto se 
+parezca a la variable @puesto 
+create or alter proc p_emple_sal_promedio 
+  @puesto varchar(30) = '%',
+  @suma numeric(6,2) output, / retornara su valor 
+  @promedio numeric(6,2) output, / retornara su valor 
+as 
+ select * from empleados where puesto like @puesto 
+ select @suma = sum(sueldo) from empleados 
+                where puesto like @puesto 
+  select @promedio = avg(sueldo) from empleados 
+                where puesto like @puesto 
+#se estan declarando variables y su tipo de dato, se ejecuta el procedimiento dandole un parametro selecciona la variable @sumatoria alias total y @prom alias promedio  
+declare 
+  @sumatoria numeric(6,2), @prom numeric(6,2)
+  exec p_emple_sal_promedio 'Desarrollador',
+  @sumatoria output, @prom output 
+  select @sumatoria as total, @prom as promedio 
+
+#enciptacion 
+#excec sp_helptext p_bonificacion;/ para saber en contenido del objeto 
+create or alter procedure p_bonificacion 
+with encryption   / al poner esto establecemos que nadie vera el contenido del procedimiento expecto nosotros  
+                  / solo se tiene que eliminar la linia para quitar la encriptacion 
+as 
+  begin 
+  if exists(select * from empleados 
+            where cant_hijos > 1)
+  begin 
+    update empleate set sueldo = sueldo*0.20;
+    print'xdsxdas'
+end 
+else 
+  begin 
+  print'xxdxa'
+  end 
+end;
+
+#tablas temporales/ duran solo durante nuestra sesion de usuario/ no se crean vistas en tablas temporales/# secrea  
+create table #usuarios(                     /como tabla global 
+  nombre varchar(10),
+  nombre varchar(10),
+  primary key(nombre)
+);
+select * from #usuarios; /seleccionar de la tabla temporal 
+insert into #usuarios values('jose','1234');/ ingreso de datos en la tabla temporal 
+
+#funcion
+#crea o altera una funcion f_suma, tendra sus variables y retornara un int, en el bloque se declara @resultado int 
+y espablece a la variable @resultado = lasumadelosvalores y retorna el ·resultado 
+create or alter function f_suma 
+  (@valor1 int, @valor2 int)
+  returns int 
+  as 
+  begin   / seccion de ejecucion
+    declare @ resultado int
+    set @resultado = @valor1 + @valor2 
+    reutrn @resultado 
+  end;
+
+select dbo.f_suma(50,50) as total ; / asi se llama a la funcion
+select datename(month,fecha) from facturas;
+
+#crea o altera la funcion declara la variable y retornara la variable, se declara la variable =y en caso de que el nombre del mes de @fecha y cuando encuentre '' traera el otro valor '' en español,terminara el case y retornara el @  
+create or alter function f_meses 
+(@fecha date)
+returns varchar(15)
+as 
+begin
+  declare @nombre varchar(15)
+  set @nombre = 
+  case datename(month, @fecha)
+  when 'January' then 'Enero'
+  when 'february' then 'febrero'
+  --- y asi con todos los meses 
+end --del case 
+  return @nombre 
+end; 
+
+select cliente ,
+  dbo.f_meses(fecha) as 'Mes de ingreso'
+from facturas;
+
+#crea o altere una funcion f_autor con las variables y retornara una tabla, retornara la seleccion de todos los valores mientras autor = @autor variable 
+create or alter function f_autor
+  (@autor varchar(30))
+  returns table 
+  with encryption / encriptara la funcion y no lo vera nadie 
+as 
+  return(select * from libros 
+        where autor = @autor)
+        #where autor like '%'+@autor+'%'); / ahora seleccionara todos los valores que se parecescan al valor de @var 
+
+select * from f_autor('Homero'); / seleccionara todos los valores usando la funion y que sea 'homero' los libros
+                      #cualquier valor lo encontrara mientras este en ''
+
+#trigger / se usan en tabla o vistas / mantienen la integridad de los datos/ no retorna parametros ni los recibe  
+#tipos after inster / after update/ after delete / instead of 
+#crea o altera un trigger llamado t_inserta en la tabla prueba, despues controlara los inserts y en el bloque se declara las variables y se establece que @ sea = a la adquisicion de usuario y despues se inserta en la tabla control los valores de la variable @ y la fecha 
+create or alter trigger t_inserta #t_update #t_delete
+on pruba 
+after insert #update #delete 
+as 
+  begin
+    declare @usuario varchar(30);
+    set @usuario = suser_name();
+    insert into control values(@usuario,getdate(),'Insert' #'update'#'delete'); / se creara un campo accion con el valor 'insert' / si se pone update en el campo accion aparecera update / 
+end;
+    
+inser into prueba values(1,'jose',getdate(),1.20);
+update prueba set id = 2 where id = 1;
+delete from prueba where id = 2; / mostrara un delete en el campo accion 
+#se crea un trigen para la tabla empleados y que controle el interto,update y delete y se declarara las variables@hora trayendo los 8 caracteres del lado derecho de la fecha actual y si existen fial afectadas por las insertacion de filas luego, si existe alguna fila borrada en la operacion, y se insertara el  usuario,la hora y el texto '', sino mostrara que se inserto en la tabla empleados y sino se cumplen los dos mostrara el usuario,hora y el mensaje ''
+
+create or alter trigger tr_control_emple 
+on empleados 
+for insert, update, delete 
+as 
+  declare 
+   @ora varchar(20) = right(getdate(),8);
+  if exists(select 0 from inserted)
+    begin 
+    if exists (select 0 from deleted)
+    begin 
+      insert into control_emple values 
+      (suser_name(),getname(),#hora, 'Actualizo en la tabla empleados');
+      end 
+       else 
+         begin 
+         insert into control_emple values 
+         (suser_name(),getname(),#hora, 'Inserto en la tabla empleados');
+        end 
+end 
+  else
+    begin 
+     (suser_name(),getname(),#hora, 'Borro en la tabla empleados');
+ insert into empleados values (------)
+ mostara el usuario la fecha,la hora y el mensaje 
+ update empleados set salario = 800.00 where id_empleado = 41;
+ select "from control_empleados / mostrara el mensaje se actualizo la tabla 
+ delete from empleados where id = 41;
+ select * from control_emple; / mostrara el mensaje se elimino en la tabla empleados 
+
+#crea o altere un trogertr----- en productos y envez de insertar datos se hara un bloque al mensaje de la consola y no permitira la insercion de datos y se insertara dentro de control_productos los valores usuario-----y es imprimira el mensaje no es posible 
+create or alter trigger tr_blockinsert_productos
+on productos 
+instead of insert 
+as 
+  begin 
+  set nocount on 
+  insert into control_productos values 
+  (suser_name(),getdate(),right(getdate(),8), 'Intento un insert');
+  print 'NO ES POSIBLE INSERTAR DATOS EN ESA TALBA';
+end;
+
+pcreate or alter trigger tr_blockupdate_productos
+on productos 
+instead of update 
+as 
+  begin 
+  set nocount on 
+  insert into control_productos values 
+  (suser_name(),getdate(),right(getdate(),8), 'Intento una actualizacion ');
+  print 'NO ES POSIBLE ACTUALIZAR DATOS EN ESTA TABLA';
+end;
+
+create or alter trigger tr_blockdelete_productos
+on productos 
+instead of delete
+as 
+  begin 
+  set nocount on 
+  insert into control_productos values 
+  (suser_name(),getdate(),right(getdate(),8), 'Intento borrar un registro');
+  print 'NO ES POSIBLE BORAR DATOS EN ESA TALBA';
+end;
+
+#desabilidar un trigger 
+drop trigger nombredeltrigger / asi se borraria definitiva 
+#altera la tabla productos y sesabilita el trigger tr_----
+alter table productos 
+disable#enable trigger tr_blockdelete_productos / con enable se habilita el trigger 
+
+#raiserror
+#se la cantidad de registros a borar es > 2 se disparara el mensaje '' y va a deshacer el intento de borar
+create or alter trigger tr_borra_empleados 
+on empleados for delete 
+as 
+  if(select count(*) from deleted)>2
+    begin 
+      raiserror('NO SE PUEDE ELIMINAR MAS DE DOS EMPLEADOS',16,1)/ necesita el codigo de error que es el 16,1 
+      rollback transaction /deshace la accion 
+end;
+
+create or alter trigger tr_actualiza_empleados 
+on empleados for update 
+as 
+  if update(sueldo)
+    begin 
+      raiserror('NO SE PUEDE actualizar este campo',16,1)/ necesita el codigo de error que es el 16,1 
+      rollback transaction /deshace la accion 
+end;
+/ en este trigger no va permitir la insercion de datos donde el puesto  sea gerente 
+create or alter trigger tr_inserta_empleados 
+on empleados for insert
+as 
+  if(select puesto from inserted) = 'Gerente'
+    begin 
+      raiserror('NO SE PUEDE PERMITE INSERTAR ESTE PUESTO',16,1)/ necesita el codigo de error que es el 16,1 
+      rollback transaction /deshace la accion 
+end;
+
+#bulk insert dinamico/ asi se puede hacer la carga diaria de datos si el archivo constantemente se modifica  
+#cargar granes cantidad de datos de un archivo externo / si se actualiza a cada razo ese archivo 
+if(select name from tempdb.sys.tables) like '%#basepedidos%'; / si existe el nombre dentro de tempdb--- un numbre quedrop table #basepedidos  
+  se parece a basepedidos se eliminara y se volvera a crear
+
+create table #baspedido(
+Codigo pedido varchar(100) notnull,
+Documento cliente varchar(100) notnull,
+CodigoCiudad int null,
+CodigoProducto varchar(100) null,
+FechaPedido date,
+HoraPedido time,
+); / tabla temporal
+
+
+# se esta haciendo una bolcado de datos a la tabla temporal #base pedidos desde la ruta del archivo y que tome como primera fila la fila 2
+bulk insert #basepedidos 
+from 'c:/larutayelarchivoarchivo.txt' - laruta del archivo 
+with(firstrow = 2)
+
+#mostrara la version del programa y mas informacion
+print 'Version;' + @@version; 
+#imprimiria el lenguaje en el que esta el sistema o servidor  
+print 'Lenguaje;' + @@language;
+#devuelve nombre del servidor
+print 'servidor' + @@servername:
+#devuelve numero de conexiones del usuario 
+print 'Conexiones:' + str(@@conecction);
+#devuelve maximas conexxiones permitidas en la base de datos 
+print 'Conexiones maximas: ' + str(@@max_conecctions);
+#devuelve el tiempo en segundos de actividad de la base 
+print 'tiempo en proceso; ' + str(@@cpu_busy) + 'Segundos';
+#devuelve tiempo en segundos de inactividad de la abse 
+print 'Tiempo inactivo: ' + srt(@@idle) + 'Segundos';
+#devuelve el numero de transacciones de la base 
+print 'transacciones activas: ' + str(@@trancount);
+#devuelve filas afectadas en ultima operacion 
+print 'ultimas #filas operacion: ' + str(@@rawcount);
+#devuelve ultima operacion fecth en un cursor 
+print 'ultimo fetch de un cursor: ' + str(@@fetch_status);
+#devuelve codigo de error de ultimma operacion 
+print 'Error ultima operacion ' + str(@@error);
+#devuelve ultimo valor identity ingresaro
+print 'ultimo identity: ' + str(@@identity);
+#devuelve el primer dia de la semana  
+print 'Primer dia de la semana: ' + str(@@datefirst)
+#devuelve tiempo de bloqueo de sesion / en este caso no esta activado y devolvera un -1 
+print 'Bloqueo en milisegundos: ' + str(@@lock_timeout)
+
+#loops / solo se una los bucles while 
+#se declara una variable y se establece su valor y mientras @conteo sea <=10 se impimite el valor de conteo convertido en el tipo de dato varchar y se aumentara de 1 en uno a la @conteo 
+declare 
+  @conteo int = 0;
+while @conteo <=10
+  begin 
+  print (convert(varchar,@conteo));
+  set @conteo +=1;
+end
+#se esta declarando las variablñes y establecido sus valores y mientras @conteo sea <=10 se imprimira el valor de @tabla convertido a str + 'x' + valor de @conteo convertido a str + '=' + la multiplicacion de los valores @tabla * conteo convertidos a str y a conteo se le aumentaar en 1 cada vez hasta que @conteo sea <= 10 
+declare 
+  @conteo int = 0,
+  @tabla int = 2;
+while @conteo <=10
+  begin 
+  print (str(@tabla) + 'X' + str(@conteo) + '= ' + str(@tabla * @conteo));
+  set @conteo +=1;
+end
+#break / para romper el bucle o realizar una accion antes del buble 
+# se delcar alas variables y en el bucle mientras @conteo z= 12 se imprimira 'contando' y establece @conteo +=1 y si @conteo es igual = 7 se rompera el buble y se imprimira el yavor ya es @conteo oseas 7
+declare 
+  @conteo int = 1;
+while @ conteo <= 12 
+  begin 
+  print('contando..');
+  set @conteo +=1;
+  if @ conteo = 7 break 
+
+end
+ print 'El valor ya es: ' + str(@conteo);
+#se crea una variable yt se establece su valor y mientras el @valor sea <=10 entonces se imprimiera contando y que se establezca a @valor +=1 y si @valor es =igual a 7 se imprimira el valor es pero continuara el bucle e imprimira el valor es denuevo 
+ declare 
+  @valor int = 1;
+  while @valor <=10 
+    begin 
+    print 'Contando...'
+    set @valor +=1; 
+    if @valor = 7 
+      print 'el valor ya es :' + str(@valor);
+      continue / si no es 7 continuara hasta que sea 7 y se imprimira el mensaje el valor es 7 
+end; 
+  print 'el valor ya es :' + str(@valor);/ se imprimira este mensaje cuando @valor sea >10 
+#se declaran las variables y sus valores y mientras @valor1 sea <=4 se imprimira una concat entre 'lopp'y@valor1 y mientras @valor 2 <=8 se concat 'loppp' y @valor2 se establecera al @valor2 una suma +=2 en dos y cuando llegue a 8 se continucara con el primer bluque sumandole y estableciendole @valor1 +=1 en 1 hasta que sea =4 
+declare 
+  @valor1 int =1,
+  @valor2 int = 2;
+  while @valor1 <=4 
+    begin 
+    primt concat('loop externo: =', @valor1);
+    while @valor2 <=8 / el bucle anidado siempre tendra prioridad  
+      begin 
+      print concat('loop anidado: = ',@valor2);
+      set@valor2 +=2;
+      end 
+      set @valor1 +=1;
+end 
+
+#manejo de registros con bucle while 
+#se crea o alter un procedimiento pr_ver--- y se declara las variables y su valor sera el maximo valor de idproducto de productos y mientras @conteo sea > 0 se seleccionara todos los datos de productos mientras idproducto sea = @conteo y estableciendo una resta en conteo @conteo de 1 -=1 
+create or alter procedure pr_ver_productos 
+as 
+  declare 
+  @conteo int = 
+  (select max(idproducto) from productos);
+while @conteo > 0
+  begin 
+    select * from productos where idproducto = @conteo; 
+    set @conteo -=1;
+
+#crea o altera un procedimiento pr----- se declara la variable en donde su valor sera el valor minimo seleccionado de idproducto de productos y mientras @id >0 se actualizara productos estableciendo precio_unidad sea = precio_unidad *0.9(descuento) y en donde idproducto sea = @id y vendidos sea nulo, despues seleccionara @id en donde su valor sera el min de idproducto de productos y n donde idproducto > @id y vendidos sea null  
+create or alter procedure pr_descuento 
+as 
+  Declare @id int 
+  select @id = min(idproducto) from productos 
+
+while @id >0 
+  begin 
+    update productos 
+    set precio_unidad = precio_unidad * 0.9
+    where idproducto = @id and vendidos is null 
+
+    select @id = min(idpproducto) from productos 
+    where idproducto > @id and vendidos is null / buscara el siguiente id que sea mayoe a idproducto y hara eso 
+end;
+exec pr_descuento; / se ejecuta el prodedimiento  
+
+#cursores / son objetos que permiten recorer filas para traer resultados de consultas de forma secuencial 
+/ tipos / cursores de colo lectura / cursores de actualizacion / cursores d einsercion/ cursotes de combinacion 
+#se crea una varibabley su tipo de dato y se declara un cursor prod_info y que haga una seleccion de todos los registros de precio_unidad de productos y prod_info los almacenara entonces se abrira el cursor, se hara una extraccion de cada registros saltando en cada uno de prod_info y lo intruducira en @descripcion y mientras @@fe-- = 0 se verificara la extraccion y que si se hizo corrrectamente y se recupero una fila, traera en pantalla @descipcion y pasara a extraer el siguiente valor y se almacenara en @descipcion, se finaliza se cierra el prod_info el cursor , 
+declare 
+  @descripcion numeric(6,2);
+declare 
+  prod_info cursor for 
+select precio_unidad prom productos 
+open prod_info 
+fetch next from prod_info into @descipcion 
+while @@fetch_status = 0 / mientras este bien la extraccion de datos hara lo siguiente 
+begin 
+  print @descipcion 
+  fetch next from prod_info into @descripcion 
+end 
+  close prod_info 
+  deallocate prod_info / ayuda a optimizar el uso de recursos de datos 
+#se declaran 5 variables y se declara el cursor de solo lectura y va seleccionas idproducto---- de productos y se almacenaran en cu_productos, se abrira cu_productos extrae el primer valor del cursor, se va introducir en cada variable @id--- y mientras @@fetch sea = 0 o sea correcta, se imprimira los datos, despues se introducira los datos en la variables y se repitira despues se cierra el cursor / cursor tipo tabla 
+declare 
+  @id int 
+  @nombre varchar(50),
+  @precio numeric(6,2),
+  @existencia int, 
+  @venidos int ;
+declare 
+  cu_productos cursor local static read_only  / solo es para la sesion de usuariolocal 
+  for select idproducto, nombre, precio_unidad, 
+             existencia, vendidos from productos;
+  open ccu_productos;
+  fetch next from cu_productos 
+  into @id, @nombre, @precio, @existencia, @vendidos 
+  while @@fetch_status = 0 
+    begin 
+    print str(@id) + @nombre + str(@precio) + str(@existencia) + 
+          str(@vendidos);
+    fetch next from cu_productos into @id, @nombre, @precio,
+                                      @existencia,@vendidos;
+  end;
+  close cu_productos;
+  deallocate cu_productos;
+
+#cursor actualizar datos
+#se declaran las variables se crea el cursor con que haga la seleccion de id---- donde el puesto sea = secretaria, luego abre el cursor y extrae la primera fila del cursor y se almacene en la variable @idemple,@nuevosal y mientras @@fetch no de ningun error ser establece que @nuevo sal sea = nuevosal * 1.10 y se actualize empleados estableciendo el valor de @nuevosal a salario y en donde el bucle este en la fila actual, ira a la siguiente fila e ingresara denuevo los valores a @idempleado, @nuevosal , se cierra el cursor y se establece para que se optimize 
+declare 
+  @idempleado int, 
+  @nuevosal numeric(10,2),
+declare 
+  cu_salarios cursor for 
+  select idempleado, salario from empleados 
+  where puesto = 'secretaria'
+open cu_salarios 
+fetch next from cu_salarios into @idempleado, @nuevosal 
+while @@fetch_status = 0 
+begin 
+  set @nuevosal = @nuevosal = 1.10;
+  update empleados set salario = @nuevosal 
+  where current of cu_salarios; 
+  fetch next from cu_salarios into @idempleado, @nuevosal; 
+end;
+close cu_salarios;
+deallocate cu_salarios; 
+
+#creacion de usuarios 
+use bd-nombrebasededatos / para seleccionar la base de datos 
+select * from sys.schemas; / para ver los squemas en el sistema 
+create schema prueba2;
+create login usuariotsql/nombredelusuario with pasword/asignacontra = 'CURSOsql100%'/contra, / se crea la sesion 
+check_expiration = on, / va decir que cuando ingrese cambie su contra a otra 
+check_policy = on, / que cuando ingrese su contra tiene uqe cumplir con las politicas o reglas para contra 
+
+create user usuariotsql for login usuariotsql / se crea el usuairo 
+whith default_schema = prueba2 / el esquema por defecto sera prueba2 que se creo antes 
+
+grant select on schema::dbo to usuariotsql; / se esta dando permiso en todas las tablas 
+grant create table to usuariotsql as dbo / se da permisio para crear tablas al usuariotsql en esquema dbo  
+grant insert, update, delete on dbo.prueba6/tabla to usuariotsql / se esta dando permisos para datos ingresar---
+/ y asi con mas permisos solo los tenemos que agregar 
+revoke insert, update, delete on dbo.prueba6 to usuariotsql /se esta revocando o quitando este permiso al usuariotsql
+
+#jog es una unidad de trabajo automatica sirve/copia de seguridad y restauracion/ reindexacion y mantenimiento de indices / ejecucion de scripts /generacion de informes y notificaciones  
+#sql configuration manager entrar para activar sqlserver manager 
+
+#video84-informaticonfig para ver como crear jobs/ no vale mediante comandos 
+#asi se crea un back mediante peticion 
+backup database Prueba2-nombredeladb 
+to disk = 'c:/---larutadelacarpetaparaelbackup/prueba2.bak' / el .bak es el nombre del backup 
+
+#va verificar la sumatoria de todos los registros de monto orden y estara en la columna total_ventas 
+select id_orden, fecha_orden, monto_total, id_cliente, 
+sum#avg(monto_total) over() as Total_ventas 
+from ordenes;
+
+#seleciona---- dentro de cada particion de idmpleado y se almacena en salario promedio 
+select idempleado, nombre, puesto, iddepartamento, salario, 
+avg(salario) over(partition by iddepartamento) as 'Salario promedio dep:'
+from empleados;
+
+#divide los datos en particiones #
+selecy idempleado, nombre, iddepartamento, salario 
+round(100*salario / sum(salario) over(partition by iddepartamento), 2)
+as 'procentaje de salario total'
+from empleaods;
+
+#
+antes de aplicar la funcion rank() los datos se ordenan segun las columnas especificas en la clausula orderby/ la funcion rank() asigna un rango a cada fila basandose en el orden de los datos despues de la ordenacion 
+#seleccion las columnas y devuelve la posicion de cada fila en el conjunto de resultados vasandose en el ordee by salario y coo alias rango de empleados y seran ordenados por Rango el alias 
+select idempleado,nombre,puesto,iddepartamento,salario, 
+rank() over(order by salario desc) as Rango 
+from empleados 
+order by Rango 
+
+#with() para consultas cte /cte es una consulta temporal 
+#se esta usando with para definir una consulta con un conjunto de tablas y se usa as para definir que tablas van estar en empeadoscte / cte actua como una tabla temporal para almacenal los datos del select de empleados 
+with EmpleadosCTE as (
+select idempleado, nombre, puesto, iddepartamento, salario 
+from empleados )
+select * from EmpleadosCTE;
+#se esta almancenando en rankin un rango en donde sera ordenado por salario de forma desc en donde tendra un alias rango de empleados 
+with rankin_empleados as (
+select idempleado, nombre, puesto, salario 
+rank() over(order by salario desc) as Rango 
+from empleados )
+select * from rankin_empleados where rango <=5;
+
+# selecciona estos datos de las difentetas tablas de productos y va hacer un enlace cruzado con empaques 
+select productos.nombre, 
+       empaques.descipcion,
+       productos.preio * empaques.peso 
+from productos 
+cross join empaques 
+order by nombre;
+
+#rollback deshacer en caso de error y se restaura al estado de antes / comit totas operacions realizas seran como exitosas y se guardan en la base de datos y no se puede cambiar - confirma y guarda todos los cambios que se hacen 
+#actualize la tabla empleados y que establezca la multiplicacion y y si el promedio de salario es mayor = 4000 se deshara la acciones de uptade y no se realizara la actualizacion 
+begin transaction; / marca el inicio de una transaccion o accion 
+update empleados set salario = salario + 1.5;
+if(select avg(salario) from empleados) >=4000 / si esto se cumple se deshace la actualizacion 
+begin 
+  rollback transaction 
+  print 'ejecucion revertida, promedio de salarios no cumple requerimiento '
+end;
+else 
+  begin 
+    commit transaction; / y si >= no se cumple se hara un update y no se revertira y se mandara el mensaje print 
+    print 'Salarios actualizados correctamente '
+#
